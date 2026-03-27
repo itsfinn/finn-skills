@@ -2,6 +2,53 @@
 
 All notable changes to the autodocs skill will be documented in this file.
 
+## [2.2.2] - 2026-03-27
+
+### 🐛 Bug Fixes
+
+#### 1. Agent 在文档中编造 QS 分数
+
+- **问题**: Agent 在文档中自己写 "质量评分: QS = 0.92"，这是虚假信息
+- **根因**: SKILL.md 和 program.md 没有明确禁止在文档中包含 QS 分数
+- **修复**:
+  - SKILL.md 新增规则 #7: "Do NOT include QS scores in documents"
+  - program.md 新增警告：QS 由 verify.py 计算，不应该出现在文档中
+  - program.md 新增约束 #12: "不能在文档中编造 QS 分数"
+
+**影响**: 修复后，Agent 不会在文档中编造 QS 分数，QS 只能由 verify.py 脚本计算。
+
+---
+
+### 📝 Documentation Updates
+
+#### SKILL.md
+
+- ✅ 新增规则 #7: 禁止在文档中包含 QS 分数
+
+#### references/program.md
+
+- ✅ QS 部分新增警告：QS 由 verify.py 计算，不应该出现在文档中
+- ✅ 新增约束 #12: 不能在文档中编造 QS 分数
+
+---
+
+### 🎯 Summary
+
+| 类别 | 变更数 |
+|------|--------|
+| Bug Fixes | 1 |
+| Documentation Updates | 2 |
+
+**核心改进：**
+- ✅ 修复 Agent 在文档中编造 QS 分数的问题
+- ✅ 明确 QS 只能由 verify.py 计算
+- ✅ 防止虚假质量评分出现在文档中
+
+---
+
+**维护者**: Sisyphus Agent
+**更新时间**: 2026-03-27
+
 ## [2.2.1] - 2026-03-27
 
 ### 🐛 Bug Fixes

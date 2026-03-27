@@ -91,6 +91,7 @@ Replace `{baseDir}` with this skill's directory path. Do NOT copy verify.py to t
 4. Every code reference must include a clickable link with line number
 5. Include at least one Mermaid diagram per document
 6. Do NOT optimize for QS score — honest marking is more important than high scores
+7. **Do NOT include QS scores in documents** — QS is calculated by verify.py, not by you
 
 ## References
 
