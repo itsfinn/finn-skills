@@ -23,12 +23,19 @@
 
 **每个内容段落都必须标记可信度：**
 
-| 标记 | 含义 | 使用场景 | 示例 |
+| 标记 | 含义 | 使用条件 | 示例 |
 |------|------|----------|------|
-| `[✅ 已验证]` | 代码已读取确认 | 直接从代码中读取并验证的内容 | `[✅ 已验证] 这是一个消息队列处理循环（见 [main.cr:122](./src/main.cr#L122)）` |
-| `[⚙️ 自动提取]` | 从配置/结构提取 | 从 package.json、目录结构、注释等自动提取 | `[⚙️ 自动提取] 依赖：kemal（从 shard.yml 提取）` |
-| `[❓ 推测]` | 基于模式推测 | 无法从代码确认但根据模式可能存在 | `[❓ 推测] 可能支持 WebSocket（见 [routes.cr:45](./src/routes.cr#L45)）` |
-| `[🚫 未知]` | 无法确定 | 确实无法从现有信息确定的内容 | `[🚫 未知] 错误处理流程待确认` |
+| `[✅ 已验证]` | 代码已读取确认 | **必须引用具体代码行** | `[✅ 已验证] 调度器是消息队列循环（见 [main.cr:122](./src/main.cr#L122)）` |
+| `[⚙️ 自动提取]` | 从配置/结构提取 | 从 package.json、YAML、目录结构提取 | `[⚙️ 自动提取] 依赖：kemal（从 shard.yml 提取）` |
+| `[❓ 推测]` | 基于模式推测 | 看到部分代码但无法完全确认 | `[❓ 推测] 可能支持 WebSocket（见 [routes.cr:45](./src/routes.cr#L45)）` |
+| `[🚫 未知]` | 无法确定 | 找不到相关代码或配置 | `[🚫 未知] 错误处理流程待确认` |
+
+**`[✅ 已验证]` 的判断标准：**
+- ✅ 你读了具体代码行，能引用它 → `[✅ 已验证]`
+- ❌ 你大概扫了一眼，觉得是这样 → `[❓ 推测]`
+- ❌ 你根据经验猜的 → `[❓ 推测]`
+
+**宁可标 `[❓ 推测]` 也不虚假标 `[✅ 已验证]`。**
 
 **段落级标记示例：**
 
@@ -131,7 +138,12 @@ flowchart TD
 
 ### 支柱 2: 精确代码链接系统（必须使用）
 
-**所有代码引用必须遵循以下格式：**
+**所有代码引用必须指向项目根目录的源代码文件。** 链接前缀取决于文档位置：
+- 文档在 `.autodocs/` 下 → `./src/...`
+- 文档在 `.autodocs/sub/` 下 → `../src/...`
+- 文档在 `.autodocs/a/b/` 下 → `../../src/...`
+
+以下示例假设文档在 `.autodocs/` 目录（使用 `./` 前缀）：
 
 #### 格式 1: 单行引用（文本内联）
 
@@ -209,7 +221,7 @@ flowchart TB
 
 ## 质量分数 (QS)
 
-每次迭代后，运行 `python verify.py` 计算 QS。
+每次迭代后，运行 skill 目录中的 `verify.py` 计算 QS（不要复制到项目目录）。
 
 ### QS 计算公式
 
@@ -240,24 +252,6 @@ QS = w1×Structure + w2×Honesty + w3×Accessibility + w4×LinkValidity + w5×Vi
 
 ---
 
-## Agent 循环
-
-```
-LOOP FOREVER:
-1. 读取 docs/ 目录下的文档
-2. 分析当前 QS 和各维度分数
-3. 提出改进想法（如：添加缺失标记、改善结构、修复链接、添加图表）
-4. 修改文档
-5. 运行 python verify.py 获取新 QS
-6. 如果 QS 提高 → 保持更改
-   如果 QS 降低 → git reset 撤销
-   如果崩溃 → 尝试修复（最多 3 次）
-7. 记录到 results.tsv
-8. 继续
-```
-
----
-
 ## 约束（Agent 不能做）
 
 1. **不能创建未标记的内容** — 任何段落必须有可信度标记
@@ -265,66 +259,13 @@ LOOP FOREVER:
 3. **不能编造信息** — 无法从代码确认的内容必须标记为 `[🚫 未知]`
 4. **不能假设环境** — 不要写"只需要运行 npm install"，除非确认了依赖
 5. **不能忽略未知** — 如果不知道某些内容，用 `[🚫 未知]` 标记
-6. **不能修改 verify.py** — 验证脚本是唯一的 truth source
+6. **不能修改任何现有文件** — skill 文件（SKILL.md、references/、scripts/）和项目代码都是只读的，只生成 `.autodocs/` 下的新文件
 7. **不能删除诚实标记** — 已标记为 `[❓ 推测]` 或 `[🚫 未知]` 的内容不能改为无标记
 8. **不能缺少可视化** — 文档必须包含至少一个 Mermaid 图表
 9. **不能等待人工确认** — 必须完成自动化文档生成，即使有未知内容
-
----
-
-## 文档结构指导（参考，非强制）
-
-### 代码导读文档结构
-
-```markdown
-# [项目名] [功能名] 代码导读
-
-> **目标**: 通过 [场景描述]，深入导读整个代码流程
-> **创建时间**: YYYY-MM-DD
-> **更新时间**: YYYY-MM-DD
-
-## 目录
-
-- [整体流程概览](#整体流程概览)
-- [Phase 1: xxx](#phase-1-xxx)
-- [附录](#附录)
-
-## 整体流程概览
-
-[mermaid flowchart]
-
-## Phase 1: [阶段名]
-
-### 第 1 步：[步骤描述]
-
-**文件**: [filename.ext](./path/to/filename.ext)
-
-**关键代码位置**：
-
-| 行号 | 功能 | 说明 |
-|------|------|------|
-| [L24-29](./path#L24) | xxx | xxx |
-
-**核心代码**：
-
-```language
-// 从第 XX 行开始
-代码片段...
-```
-
-## 附录
-
-### 关键文件路径
-```
-
-如果项目状态不明确，按以下优先级输出：
-
-| 项目阶段 | 优先级 | 可简略 |
-|----------|--------|--------|
-| 早期原型 | README + 一句话描述 | 安装步骤、API 文档 |
-| 成长期 | Quick Start + 核心概念 | 完整架构设计 |
-| 成熟期 | API 参考 + 故障排查 | 从 0 开始的 Tutorial |
-| 维护/遗产 | 迁移指南 + 遗留风险 | 新功能文档 |
+10. **不能虚假标 `[✅ 已验证]`** — 能引用具体代码行才标已验证，否则用 `[❓ 推测]`
+11. **不能追求 QS 分数** — 诚实标记比高分更重要，不要为了分数改变可信度标记
+12. **不能使用 git reset** — 会丢失用户未提交的修改，使用文件备份代替
 
 ---
 
@@ -335,141 +276,6 @@ LOOP FOREVER:
 - 段落级可信度标记覆盖率 100%
 - 代码链接有效率 100%
 - 可视化图表 ≥ 1 个
-
----
-
-## Python 环境说明
-
-### 依赖情况
-
-`verify.py` **仅使用 Python 标准库**，无需安装第三方依赖：
-
-```python
-import re        # 标准库：正则表达式
-import sys       # 标准库：系统参数
-from pathlib import Path      # 标准库：路径处理
-from datetime import datetime # 标准库：时间处理
-```
-
-### 兼容性
-
-- ✅ Python 3.6+
-- ✅ 无需虚拟环境
-- ✅ 无需 pip install
-
-### 未来扩展
-
-如果未来需要添加第三方依赖（如 `pyyaml`、`requests` 等），建议：
-
-1. **创建虚拟环境**（可选）：
-```bash
-cd .autodocs
-python3 -m venv venv
-source venv/bin/activate  # Linux/macOS
-# 或 venv\Scripts\activate  # Windows
-```
-
-2. **安装依赖**：
-```bash
-pip install -r requirements.txt
-```
-
-3. **requirements.txt 示例**：
-```
-# 当前无需依赖，仅示例
-# pyyaml>=6.0
-# requests>=2.28.0
-```
-
----
-
-## 输出格式
-
-每次迭代记录到 `results.tsv`：
-
-```
-timestamp	qs	change_summary
-2026-03-26T10:30:00	0.82	添加了架构流程图
-```
-
----
-
-## 代码链接生成最佳实践
-
-### 使用 grep/ripgrep 定位代码
-
-```bash
-# 基础用法：查找关键字并显示行号
-grep -n "def schedule" src/scheduler.cr
-rg -n "def schedule" src/
-
-# 输出示例：
-# src/scheduler.cr:122:def schedule
-# src/scheduler.cr:145:def schedule_all
-```
-
-### 验证行号范围
-
-```bash
-# 查看第 122 到 135 行（确认函数边界）
-sed -n '122,135p' src/scheduler.cr
-
-# 或使用 head/tail
-head -n 135 src/scheduler.cr | tail -n 14
-```
-
-### 生成 Markdown 链接
-
-```markdown
-<!-- 单行引用 -->
-[scheduler.cr:122](./src/scheduler.cr#L122)
-
-<!-- 行范围引用 -->
-| [L122-135](./src/scheduler.cr#L122) | schedule函数定义 |
-```
-
----
-
-## Mermaid 图表最佳实践
-
-### 流程图节点命名
-
-```mermaid
-flowchart TD
-    A["用户操作<br/>点击按钮"] --> B["前端响应"]
-```
-
-- 使用方括号 `["文本"]` 包含描述
-- 使用 `<br/>` 换行
-- 节点 ID 简短（A, B, C）
-
-### 时序图参与者
-
-```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant F as 前端
-    participant G as Gateway
-    participant B as 后端
-```
-
-- 使用 `participant Xxx as 别名` 提高可读性
-- 参与者命名清晰（用户、前端、后端）
-
-### 子图组织
-
-```mermaid
-flowchart TB
-    subgraph Frontend["前端层"]
-        F1[组件]
-    end
-    subgraph Backend["后端层"]
-        B1[服务]
-    end
-```
-
-- 使用 `subgraph Name["显示名"]`
-- 按职责分组
 
 ---
 
