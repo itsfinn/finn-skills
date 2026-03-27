@@ -2,6 +2,52 @@
 
 All notable changes to the autodocs skill will be documented in this file.
 
+## [2.2.1] - 2026-03-27
+
+### 🐛 Bug Fixes
+
+#### 1. Agent 创建错误的文档目录结构
+
+- **问题**: Agent 创建 `.autodocs/docs/` 子目录，导致链接路径错误
+- **根因**: SKILL.md 指示不够明确，没有明确禁止创建子目录
+- **修复**:
+  - SKILL.md 新增明确的文档结构示例（正确 vs 错误）
+  - 新增规则 #2: "Do NOT create `.autodocs/docs/` subdirectory"
+  - 强化链接前缀规则说明
+  - 添加警告：最安全的方式是直接在 `.autodocs/` 下创建文档
+
+**影响**: 修复后，Agent 会正确地将文档直接放在 `.autodocs/` 下，链接路径也会正确。
+
+---
+
+### 📝 Documentation Updates
+
+#### SKILL.md
+
+- ✅ 新增文档结构示例（正确 vs 错误）
+- ✅ 新增规则 #2: 禁止创建 `.autodocs/docs/` 子目录
+- ✅ 强化链接前缀规则说明
+- ✅ 添加警告：最安全的方式是直接在 `.autodocs/` 下创建文档
+
+---
+
+### 🎯 Summary
+
+| 类别 | 变更数 |
+|------|--------|
+| Bug Fixes | 1 |
+| Documentation Updates | 1 |
+
+**核心改进：**
+- ✅ 修复 Agent 创建错误文档目录结构的问题
+- ✅ 修复链接路径错误的问题
+- ✅ SKILL.md 指示更明确
+
+---
+
+**维护者**: Sisyphus Agent
+**更新时间**: 2026-03-27
+
 ## [2.2.0] - 2026-03-27
 
 ### 🔴 Breaking Changes

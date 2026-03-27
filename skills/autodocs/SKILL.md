@@ -32,7 +32,27 @@ Use `glob`, `read`, and `grep` tools (or `explore` agent for large codebases) to
 
 ### 2. Generate documentation
 
-Create `.autodocs/` directory in project root. Generate markdown files there.
+Create `.autodocs/` directory in project root. **Generate markdown files directly in `.autodocs/`** — do NOT create subdirectories like `.autodocs/docs/`.
+
+**Correct structure**:
+```
+project-root/
+├── .autodocs/
+│   ├── architecture.md
+│   ├── api.md
+│   └── deployment.md
+└── src/
+```
+
+**Incorrect structure** (do NOT do this):
+```
+project-root/
+├── .autodocs/
+│   └── docs/              ← ❌ Do NOT create this
+│       ├── architecture.md
+│       └── api.md
+└── src/
+```
 
 **Link format**: Links must point to project root source files. Calculate the relative path prefix based on your output file location:
 
@@ -41,6 +61,8 @@ Create `.autodocs/` directory in project root. Generate markdown files there.
 .autodocs/arch/doc.md     → [file](../src/file.cr#L10)
 .autodocs/a/b/doc.md      → [file](../../src/file.cr#L10)
 ```
+
+> ⚠️ **Important**: If you create subdirectories under `.autodocs/` (like `.autodocs/architecture/`), adjust your link prefix accordingly. The safest approach is to put all docs directly in `.autodocs/` and use `./` prefix.
 
 **Credibility markers** (every paragraph needs one):
 
@@ -64,10 +86,11 @@ Replace `{baseDir}` with this skill's directory path. Do NOT copy verify.py to t
 ## Rules
 
 1. Only create files under `.autodocs/` — never edit SKILL.md, scripts/, or project code
-2. Every paragraph must have a credibility marker
-3. Every code reference must include a clickable link with line number
-4. Include at least one Mermaid diagram per document
-5. Do NOT optimize for QS score — honest marking is more important than high scores
+2. **Do NOT create `.autodocs/docs/` subdirectory** — put docs directly in `.autodocs/`
+3. Every paragraph must have a credibility marker
+4. Every code reference must include a clickable link with line number
+5. Include at least one Mermaid diagram per document
+6. Do NOT optimize for QS score — honest marking is more important than high scores
 
 ## References
 
